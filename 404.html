@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>404</title>
+	<link rel="stylesheet" href="style.css">
+	<style>
+		.error-code {
+			font-size: clamp(14px, 1.4vw, 18px);
+			letter-spacing: -0.03em;
+			color: #000000;
+			margin-bottom: clamp(10px, 1.6vw, 20px);
+		}
+
+		.return-link {
+			margin-top: clamp(10px, 1.6vw, 20px);
+			font-size: clamp(9px, 1vw, 13px);
+			letter-spacing: -0.02em;
+			color: #000000;
+			text-decoration: none;
+			cursor: alias;
+			opacity: 0.6;
+			transition: opacity 0.2s ease;
+		}
+
+		.return-link:hover {
+			opacity: 1;
+		}
+	</style>
+</head>
+<body>
+
+	<main class="stage">
+		<span class="error-code">[ 404 ]</span>
+
+		<div class="butterfly-frame">
+			<img src="motyl.png" alt="butterfly" class="butterfly-img">
+			<p class="quote" id="error-msg"></p>
+		</div>
+
+		<a href="index.html" class="return-link">[ return ]</a>
+	</main>
+
+	<script>
+		let hits = parseInt(localStorage.getItem('anomalyHits') || '0', 10) + 1;
+		localStorage.setItem('anomalyHits', hits);
+
+		const msg = document.getElementById('error-msg');
+		if (hits === 1) {
+			msg.textContent = "whatcha lookin for buddy?";
+		} else if (hits === 2) {
+			msg.textContent = "this action will have consequences";
+		} else {
+			msg.textContent = "the butterfly flapped its wings";
+		}
+	</script>
+</body>
+</html>

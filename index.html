@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>larpujemy.pl</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="stage">
+    <div class="butterfly-frame">
+      <img src="motyl.png" alt="butterfly" class="butterfly-img">
+      <p class="quote">
+        a butterfly's wing beat in brazil can cause a tornado in texas
+      </p>
+
+      <div class="os-window" id="os-window">
+        <div class="window-bar">
+          <span class="window-title" id="window-title">system.log</span>
+          <button type="button" class="window-close" id="window-close">[x]</button>
+        </div>
+        <div class="window-body" id="window-body"></div>
+      </div>
+    </div>
+
+    <nav class="links">
+      <a href="#work" id="nav-work">[ work ]</a>
+      <a href="#about" id="nav-about">[ about ]</a>
+      <a href="https://discord.com/users/1466510566385254557" target="_blank" rel="noopener noreferrer">[ catch me ]</a>
+    </nav>
+  </main>
+
+  <div class="audio-widget" id="audio-widget">
+    <div class="player-info" id="player-info">
+      <span class="track-title" id="track-title"></span>
+      <span class="track-time" id="track-time">[ 0:00 / 0:00 ]</span>
+    </div>
+
+    <div class="glyph-container">
+      <div class="vol-popover">
+        <input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.3">
+      </div>
+      <span class="music-glyph" id="music-btn">&#9834;</span>
+    </div>
+  </div>
+
+  <audio id="main-audio"></audio>
+  <script src="script.js"></script>
+</body>
+</html>
