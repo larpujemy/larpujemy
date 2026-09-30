@@ -35,6 +35,8 @@ html, body {
 	flex-direction: column;
 	align-items: center;
 	width: clamp(220px, 32vw, 420px);
+	max-width: 100%;
+	min-width: 0;
 }
 
 .butterfly-frame {
@@ -72,30 +74,37 @@ html, body {
 	);
 }
 
-/* MARQUEE — BEZ PASKÓW / BORDERÓW NAD I POD */
 .marquee-box {
 	width: 100%;
+	max-width: 100%;
 	overflow: hidden;
 	display: flex;
 	white-space: nowrap;
 	margin-top: clamp(6px, 1vw, 12px);
 	opacity: 0.6;
+	mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+	-webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }
 
 .marquee-track {
 	display: flex;
 	flex-shrink: 0;
+	min-width: 100%;
 	font-size: clamp(8px, 0.85vw, 11px);
 	letter-spacing: -0.02em;
 	color: #000000;
-	animation: marquee-scroll 22s linear infinite;
+	animation: marquee-scroll 18s linear infinite;
+}
+
+.marquee-track span {
+	white-space: nowrap;
 }
 
 @keyframes marquee-scroll {
-	from {
+	0% {
 		transform: translateX(0);
 	}
-	to {
+	100% {
 		transform: translateX(-100%);
 	}
 }
