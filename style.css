@@ -80,10 +80,20 @@ html, body {
 	overflow: hidden;
 	display: flex;
 	white-space: nowrap;
-	margin-top: clamp(6px, 1vw, 12px);
+	margin-top: clamp(-20px, -2.5vw, -8px);
 	opacity: 0.6;
 	mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 	-webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.links {
+	display: flex;
+	justify-content: center;
+	gap: 1.2vw;
+	margin-top: clamp(8px, 1.2vw, 14px);
+	font-size: clamp(9px, 1vw, 13px);
+	letter-spacing: -0.02em;
+	white-space: nowrap;
 }
 
 .marquee-track {
@@ -107,16 +117,6 @@ html, body {
 	100% {
 		transform: translateX(-100%);
 	}
-}
-
-.links {
-	display: flex;
-	justify-content: center;
-	gap: 1.2vw;
-	margin-top: clamp(8px, 1.2vw, 16px);
-	font-size: clamp(9px, 1vw, 13px);
-	letter-spacing: -0.02em;
-	white-space: nowrap;
 }
 
 .links > a {
