@@ -15,13 +15,6 @@ const hintDuration = 1200;
 const root = document.documentElement;
 const butterflyFrame = document.querySelector('.butterfly-frame');
 
-const windowTitle = document.getElementById('window-title');
-const windowBody = document.getElementById('window-body');
-const windowClose = document.getElementById('window-close');
-
-const navWork = document.getElementById('nav-work');
-const navAbout = document.getElementById('nav-about');
-
 const audio = document.getElementById('main-audio');
 const musicBtn = document.getElementById('music-btn');
 const widget = document.getElementById('audio-widget');
@@ -32,7 +25,6 @@ const slider = document.getElementById('vol-slider');
 let currentTrack = 0;
 let hintTimer = null;
 let clickTimeout = null;
-let activeView = null;
 
 if (slider && audio) {
   audio.volume = parseFloat(slider.value);
@@ -112,7 +104,6 @@ function handleMusicClick(e) {
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 document.addEventListener('keydown', (e) => {
   if (e.key === 'F12') e.preventDefault();
-  if (e.key === 'Escape' && activeView) closeWindow();
 });
 
 if (butterflyFrame) {
