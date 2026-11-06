@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMLEBUY — Direct Sourcing & Finds Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+  --bg: #090a0f;
+  --card-bg: #12141c;
+  --card-border: #1e2230;
+  --accent: #ff2a5f;
+  --accent-glow: rgba(255, 42, 95, 0.2);
+  --text: #f3f4f6;
+  --text-muted: #8890a4;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* --- DEMO BAR --- */
+.demo-bar {
+  background: linear-gradient(90deg, #ff2a5f, #7928ca);
+  color: #fff;
+  text-align: center;
+  padding: 7px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+/* --- UNIFIED MODERN NAVBAR --- */
+header {
+  position: sticky;
+  top: 14px;
+  z-index: 100;
+  padding: 0 20px;
+  margin-bottom: 25px;
+}
+
+.nav-container {
+  max-width: 1040px;
+  margin: 0 auto;
+  background: rgba(18, 20, 28, 0.85);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--card-border);
+  border-radius: 50px;
+  padding: 7px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  position: relative; /* Wymagane do precyzyjnego wyśrodkowania */
+}
+
+.logo {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  text-decoration: none;
+  color: #fff;
+  padding-left: 6px;
+  z-index: 2;
+}
+
+.logo span {
+  color: var(--accent);
+}
+
+/* Idealne geometryczne wyśrodkowanie linków nawigacji */
+.nav-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(9, 10, 15, 0.45);
+  padding: 4px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  z-index: 1;
+}
+
+.nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 18px;
+  border-radius: 25px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: #fff;
+}
+
+.nav-link.active {
+  color: #fff;
+  background: #1e2231;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 2;
+}
+
+/* Custom Dropdown Agenta */
+.agent-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.agent-select-input {
+  appearance: none;
+  -webkit-appearance: none;
+  background: #161823;
+  border: 1px solid var(--card-border);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 28px 7px 13px;
+  border-radius: 20px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.agent-select-input:hover,
+.agent-select-input:focus {
+  border-color: rgba(255, 42, 95, 0.5);
+}
+
+.agent-wrapper svg {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  stroke: var(--accent);
+}
+
+/* Koszyk */
+.cart-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--accent-glow);
+  border: 1px solid rgba(255, 42, 95, 0.45);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.cart-btn:hover {
+  background: rgba(255, 42, 95, 0.28);
+  transform: translateY(-1px);
+}
+
+.cart-btn svg {
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+}
+
+.cart-num {
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+/* --- HERO SECTION --- */
+.hero {
+  max-width: 860px;
+  margin: 40px auto 30px;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.hero-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  border-radius: 30px;
+  background: var(--accent-glow);
+  color: var(--accent);
+  border: 1px solid rgba(255, 42, 95, 0.3);
+  margin-bottom: 14px;
+}
+
+.hero h1 {
+  font-size: clamp(34px, 5.5vw, 60px);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+
+.hero p {
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 580px;
+  margin: 0 auto 30px;
+}
+
+/* --- COMPACT ROW (ZASTĘPSTWO BLOKÓW) --- */
+.compact-actions-row {
+  max-width: 780px;
+  margin: 0 auto 40px;
+  padding: 0 20px;
+  display: flex;
+  gap: 14px;
+}
+
+.compact-btn {
+  flex: 1;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.compact-btn:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  background: #161822;
+}
+
+.compact-btn .label {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.compact-btn .sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.compact-btn .arrow {
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 16px;
+}
+
+/* --- KARUZELA POPULARNYCH (15 PRODUKTÓW) --- */
+.carousel-section {
+  max-width: 1280px;
+  margin: 0 auto 70px;
+  padding: 0 20px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+.ctrl-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.ctrl-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.carousel-wrapper {
+  overflow: hidden;
+  width: 100%;
+  border-radius: 16px;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  gap: 16px;
+}
+
+.p-card {
+  min-width: calc((100% - (4 * 16px)) / 5);
+  flex: 0 0 calc((100% - (4 * 16px)) / 5);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.p-img-box {
+  width: 100%;
+  height: 180px;
+  background: #161824;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.p-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.p-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(9, 10, 15, 0.75);
+  backdrop-filter: blur(4px);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.p-score {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #10b981;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.p-details {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.p-category {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.p-title {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 12px;
+}
+
+.p-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.p-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.p-buy {
+  background: #1c202d;
+  border: 1px solid var(--card-border);
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+/* --- KATALOG & FILTRY (LINKS.HTML) --- */
+.catalog-wrap {
+  max-width: 1280px;
+  margin: 20px auto 60px;
+  padding: 0 20px;
+}
+
+.controls-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.search-box {
+  background: #0a0b10;
+  border: 1px solid var(--card-border);
+  color: #fff;
+  padding: 11px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  width: 340px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-box:focus {
+  border-color: var(--accent);
+}
+
+/* Stylizowany Target Agent Box */
+.target-agent-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #0a0b10;
+  border: 1px solid var(--card-border);
+  padding: 6px 8px 6px 14px;
+  border-radius: 14px;
+}
+
+.target-agent-box .label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.target-agent-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.target-agent-pill select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: #141724;
+  border: 1px solid rgba(255, 42, 95, 0.3);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 32px 7px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.target-agent-pill select:hover {
+  background: #1a1e2f;
+  border-color: var(--accent);
+}
+
+.target-agent-pill svg {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+  stroke: var(--accent);
+}
+
+/* Category Filter Pills */
+.category-pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.pill {
+  background: #171924;
+  border: 1px solid var(--card-border);
+  color: var(--text-muted);
+  padding: 7px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.pill:hover,
+.pill.active {
+  background: var(--accent-glow);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* --- SIATKA PRODUKTÓW (30 ITEMS) --- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 18px;
+}
+
+.grid-item {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s;
+}
+
+.grid-item:hover {
+  transform: translateY(-3px);
+}
+
+.grid-img-box {
+  width: 100%;
+  height: 180px;
+  background: #161824;
+  position: relative;
+}
+
+.grid-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge-left {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(9, 10, 15, 0.75);
+  backdrop-filter: blur(4px);
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.badge-right {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.grid-content {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.grid-cat {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.grid-name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  height: 35px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  margin-bottom: 12px;
+}
+
+.grid-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.grid-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.grid-btn {
+  background: #1c202d;
+  border: 1px solid var(--card-border);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.grid-btn:hover {
+  border-color: var(--accent);
+}
+
+/* --- RESPONSYWNOŚĆ --- */
+@media (max-width: 1100px) {
+  .p-card {
+    min-width: calc((100% - 16px) / 2);
+    flex: 0 0 calc((100% - 16px) / 2);
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-center {
+    position: static;
+    transform: none;
+  }
+  .nav-container {
+    flex-wrap: wrap;
+    gap: 10px;
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 650px) {
+  .p-card {
+    min-width: 100%;
+    flex: 0 0 100%;
+  }
+  .compact-actions-row {
+    flex-direction: column;
+  }
+  .search-box {
+    width: 100%;
+  }
+}
+  </style>
+</head>
+<body>
+
+  <div class="demo-bar">
+    ⚠️ Demonstration Preview — Built for SMLEBUY Sourcing
+  </div>
+
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo">SMLE<span>BUY</span></a>
+
+      <nav class="nav-center">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="links.html" class="nav-link">Catalog (30)</a>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="agent-wrapper">
+          <select class="agent-select-input" id="navAgent">
+            <option>Kakobuy</option>
+            <option>Mulebuy</option>
+            <option>CNfans</option>
+            <option>Basetao</option>
+          </select>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+
+        <button class="cart-btn" onclick="alert('Cart preview')">
+          <svg width="15" height="15" viewBox="0 0 24 24">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          Cart <span class="cart-num">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <span class="hero-tag">Verified Direct Batches</span>
+      <h1>Curated Streetwear<br>Straight from Suppliers</h1>
+      <p>Independent finds catalog, verified factory batches, and streamlined agent link conversion.</p>
+    </section>
+
+    <section class="compact-actions-row">
+      <a href="links.html" class="compact-btn">
+        <div>
+          <div class="label">📦 Browse All 30 Finds</div>
+          <div class="sub">View real prices, categories & QC ratings</div>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+
+      <a href="https://t.me" target="_blank" class="compact-btn">
+        <div>
+          <div class="label">✈️ Join Telegram Channel</div>
+          <div class="sub">Daily drops, shipping routes & batch alerts</div>
+        </div>
+        <span class="arrow">↗</span>
+      </a>
+    </section>
+
+    <section class="carousel-section">
+      <div class="section-header">
+        <h2>🔥 Popular Right Now (15 Curated)</h2>
+        <div class="controls">
+          <button class="ctrl-btn" onclick="prevSlide()" title="Previous">‹</button>
+          <button class="ctrl-btn" onclick="nextSlide()" title="Next">›</button>
+        </div>
+      </div>
+
+      <div class="carousel-wrapper">
+        <div class="carousel-track" id="popularTrack"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const PLACEHOLDER_IMG = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect width='400' height='400' fill='%23141620'/%3E%3Ccircle cx='200' cy='200' r='90' fill='%23191c29'/%3E%3Cpath d='M150 250 L200 150 L250 250 Z' fill='%23222738'/%3E%3Ctext x='50%25' y='82%25' dominant-baseline='middle' text-anchor='middle' fill='%235c637a' font-family='sans-serif' font-size='15' font-weight='700' letter-spacing='2'%3ESMLEBUY BATCH%3C/text%3E%3C/svg%3E";
+
+    const popularItems = [
+      { id: 1, name: "Rick Owens Geobasket Black/Milk", cat: "Sneakers", price: "$89.00", rating: "9.8/10", badge: "Hot" },
+      { id: 2, name: "Balenciaga Strike Canvas Boots", cat: "Boots", price: "$105.00", rating: "9.5/10", badge: "Trending" },
+      { id: 3, name: "Chrome Hearts Floral Zip-Up", cat: "Hoodie", price: "$55.00", rating: "9.2/10", badge: "Verified" },
+      { id: 4, name: "Acne Studios 1981M Light Blue", cat: "Denim", price: "$48.00", rating: "9.6/10", badge: "Best Batch" },
+      { id: 5, name: "Arc'teryx Beta LT Waterproof", cat: "Jackets", price: "$78.00", rating: "9.9/10", badge: "Restocked" },
+      { id: 6, name: "Maison Margiela GAT White Leather", cat: "Sneakers", price: "$65.00", rating: "9.7/10", badge: "Top Tier" },
+      { id: 7, name: "Supreme Box Logo FW23 Heather Grey", cat: "Hoodie", price: "$52.00", rating: "9.8/10", badge: "Popular" },
+      { id: 8, name: "Bape Shark Double Full Zip", cat: "Hoodie", price: "$62.00", rating: "9.0/10", badge: "Classic" },
+      { id: 9, name: "Rick Owens Bolan Banana Denim", cat: "Denim", price: "$59.00", rating: "9.4/10", badge: "Waxed" },
+      { id: 10, name: "Prada Re-Nylon Puffer Jacket", cat: "Jackets", price: "$115.00", rating: "9.6/10", badge: "Luxury" },
+      { id: 11, name: "Salomon XT-6 Black Phantom", cat: "Sneakers", price: "$58.00", rating: "9.4/10", badge: "Gorpcore" },
+      { id: 12, name: "Chrome Hearts Roller Belt 925", cat: "Accessories", price: "$45.00", rating: "9.5/10", badge: "Steel" },
+      { id: 13, name: "Balenciaga 3XL Mud Sneaker", cat: "Sneakers", price: "$98.00", rating: "9.7/10", badge: "Distressed" },
+      { id: 14, name: "Moncler Maya Down Black", cat: "Jackets", price: "$130.00", rating: "9.9/10", badge: "Warm" },
+      { id: 15, name: "Diesel 1996 D-Sire Baggy Wash", cat: "Denim", price: "$54.00", rating: "9.5/10", badge: "Oversized" }
+    ];
+
+    const track = document.getElementById('popularTrack');
+    popularItems.forEach(item => {
+      track.innerHTML += `
+        <div class="p-card">
+          <div class="p-img-box">
+            <span class="p-badge">${item.badge}</span>
+            <span class="p-score">${item.rating}</span>
+            <img src="${PLACEHOLDER_IMG}" alt="${item.name}">
+          </div>
+          <div class="p-details">
+            <span class="p-category">${item.cat}</span>
+            <div class="p-title" title="${item.name}">${item.name}</div>
+            <div class="p-footer">
+              <span class="p-price">${item.price}</span>
+              <a href="links.html" class="p-buy">Finds Link</a>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    let currentIndex = 0;
+    const totalPages = 3;
+
+    function updateCarousel() {
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % totalPages;
+      updateCarousel();
+    }
+
+    function prevSlide() {
+      currentIndex = (currentIndex - 1 + totalPages) % totalPages;
+      updateCarousel();
+    }
+
+    let autoInterval = setInterval(nextSlide, 3000);
+    track.addEventListener('mouseenter', () => clearInterval(autoInterval));
+    track.addEventListener('mouseleave', () => autoInterval = setInterval(nextSlide, 3000));
+  </script>
+</body>
+</html>
