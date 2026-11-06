@@ -293,9 +293,9 @@
       font-size: 15px;
     }
 
-    /* --- KARUZELA (1 ITEM) --- */
+    /* --- RESPONSIVE CAROUSEL (5 NA PC / 1 NA MOBILE) --- */
     .carousel-section {
-      max-width: 440px;
+      max-width: 1280px;
       margin: 0 auto 60px;
       padding: 0 16px;
     }
@@ -308,7 +308,7 @@
     }
 
     .section-header h2 {
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -321,8 +321,8 @@
     }
 
     .ctrl-btn {
-      width: 34px;
-      height: 34px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -344,26 +344,29 @@
       overflow: hidden;
       width: 100%;
       border-radius: 16px;
-      border: 1px solid var(--card-border);
-      background: var(--card-bg);
     }
 
     .carousel-track {
       display: flex;
-      transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+      transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1);
       width: 100%;
+      gap: 16px;
     }
 
-    .p-card-single {
-      flex: 0 0 100%;
-      width: 100%;
+    /* Desktop domyślnie: 5 kart w jednym rzędzie z uwzględnieniem odstępów */
+    .p-card-item {
+      flex: 0 0 calc((100% - (4 * 16px)) / 5);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
     }
 
     .p-img-box {
       width: 100%;
-      height: 250px;
+      height: 180px;
       background: #161824;
       position: relative;
     }
@@ -376,62 +379,64 @@
 
     .p-badge {
       position: absolute;
-      top: 10px;
-      left: 10px;
+      top: 8px;
+      left: 8px;
       background: rgba(9, 10, 15, 0.8);
       backdrop-filter: blur(4px);
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 10px;
       font-weight: 700;
       color: #fff;
     }
 
     .p-score {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 8px;
+      right: 8px;
       background: rgba(16, 185, 129, 0.2);
       border: 1px solid rgba(16, 185, 129, 0.4);
       color: #10b981;
-      padding: 2px 7px;
-      border-radius: 6px;
-      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-size: 10px;
       font-weight: 700;
     }
 
     .p-details {
-      padding: 16px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
+      flex-grow: 1;
     }
 
     .p-category {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-muted);
       text-transform: uppercase;
       font-weight: 700;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .p-title {
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .p-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      margin-top: auto;
     }
 
     .p-price {
-      font-size: 16px;
-      font-weight: 800;
+      font-size: 14px;
+      font-weight: 700;
       color: #fff;
     }
 
@@ -439,22 +444,40 @@
       background: #1c202d;
       border: 1px solid var(--card-border);
       color: #fff;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 8px;
+      padding: 4px 10px;
+      border-radius: 6px;
       text-decoration: none;
       transition: border-color 0.2s;
     }
 
     .p-buy:hover { border-color: var(--accent); }
 
+    /* --- MOBILE STYLES (DOKŁADNIE 1 KARTA WIDOCZNA) --- */
     @media (max-width: 768px) {
       body { padding-bottom: 80px; }
       .nav-center { display: none; }
       .mobile-bottom-nav { display: flex; }
       .compact-actions-row { flex-direction: column; }
       .cart-btn span.label-text { display: none; }
+
+      .carousel-section {
+        max-width: 440px; /* Zgrabny wyśrodkowany box na mobile */
+      }
+
+      .carousel-track {
+        gap: 0px; /* Bez luki między kartami na pełnym slajdzie 100% */
+      }
+
+      .p-card-item {
+        flex: 0 0 100%; /* Dokładnie 1 item zajmuje cały ekran */
+        border-radius: 16px;
+      }
+
+      .p-img-box {
+        height: 240px;
+      }
     }
   </style>
 </head>
@@ -527,9 +550,10 @@
       </a>
     </section>
 
+    <!-- Sekcja Karuzeli -->
     <section class="carousel-section">
       <div class="section-header">
-        <h2>🔥 Trending Item (<span id="slideCounter">1</span>/15)</h2>
+        <h2>🔥 Popular Right Now (15 Curated)</h2>
         <div class="controls">
           <button class="ctrl-btn" onclick="prevSlide()" title="Previous">‹</button>
           <button class="ctrl-btn" onclick="nextSlide()" title="Next">›</button>
@@ -564,11 +588,11 @@
     ];
 
     const track = document.getElementById('popularTrack');
-    const slideCounter = document.getElementById('slideCounter');
 
+    // Generujemy 15 itemów
     popularItems.forEach(item => {
       track.innerHTML += `
-        <div class="p-card-single">
+        <div class="p-card-item">
           <div class="p-img-box">
             <span class="p-badge">${item.badge}</span>
             <span class="p-score">${item.rating}</span>
@@ -587,23 +611,42 @@
     });
 
     let currentIndex = 0;
-    const totalItems = popularItems.length;
+
+    function isMobile() {
+      return window.innerWidth <= 768;
+    }
 
     function updateCarousel() {
-      track.style.transform = `translateX(-${currentIndex * 100}%)`;
-      if (slideCounter) slideCounter.textContent = currentIndex + 1;
+      if (isMobile()) {
+        // Na telefonie: skok o 1 item (100% szerokości tracka)
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+      } else {
+        // Na PC: skok o 5 itemów (czyli 1 cały ekran = 100% + gap)
+        // Dla 15 itemów i 5 widocznych mamy 3 strony (indeksy 0, 1, 2)
+        const gap = 16;
+        track.style.transform = `translateX(calc(-${currentIndex * 100}% - ${currentIndex * gap}px))`;
+      }
     }
 
     function nextSlide() {
-      currentIndex = (currentIndex + 1) % totalItems;
+      const maxIndex = isMobile() ? (popularItems.length - 1) : 2; // 15 stron na mobile vs 3 strony po 5 sztuk na PC
+      currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
       updateCarousel();
     }
 
     function prevSlide() {
-      currentIndex = (currentIndex - 1 + totalItems) % totalItems;
+      const maxIndex = isMobile() ? (popularItems.length - 1) : 2;
+      currentIndex = currentIndex <= 0 ? maxIndex : currentIndex - 1;
       updateCarousel();
     }
 
+    // Reset indeksu przy zmianie rozmiaru okna
+    window.addEventListener('resize', () => {
+      currentIndex = 0;
+      updateCarousel();
+    });
+
+    // Pętla auto-scroll co 3 sekundy
     let timer = setInterval(nextSlide, 3000);
     track.addEventListener('mouseenter', () => clearInterval(timer));
     track.addEventListener('mouseleave', () => timer = setInterval(nextSlide, 3000));
