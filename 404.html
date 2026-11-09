@@ -5,29 +5,128 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>404</title>
-  <link rel="stylesheet" href="style.css">
+  
   <style>
-    .error-code {
-      font-size: clamp(14px, 1.4vw, 18px);
-      letter-spacing: -0.03em;
-      color: #000000;
-      margin-bottom: clamp(10px, 1.6vw, 20px);
-    }
+    
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	cursor: crosshair;
+	user-select: none;
+}
 
-    .return-link {
-      margin-top: clamp(10px, 1.6vw, 20px);
-      font-size: clamp(9px, 1vw, 13px);
-      letter-spacing: -0.02em;
-      color: #000000;
-      text-decoration: none;
-      cursor: alias;
-      opacity: 0.6;
-      transition: opacity 0.2s ease;
-    }
+html {
+	background-color: #ffffff;
+	filter: invert(1);
+}
 
-    .return-link:hover {
-      opacity: 1;
-    }
+body {
+	background-color: #ffffff;
+	color: #ffffff;
+	font-family: "Courier New", Courier, monospace;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+html, body {
+	height: 100vh;
+	overflow: hidden;
+	overscroll-behavior: none;
+	touch-action: none;
+}
+
+.stage {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: clamp(220px, 32vw, 420px);
+	max-width: 100%;
+	min-width: 0;
+}
+
+.butterfly-frame {
+	position: relative;
+	width: 100%;
+	line-height: 0;
+}
+
+.butterfly-img {
+	width: 100%;
+	height: auto;
+	display: block;
+	pointer-events: none;
+}
+
+.quote {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 82%;
+	text-align: center;
+	font-size: clamp(9px, 1.15vw, 15px);
+	line-height: 1.3;
+	letter-spacing: -0.03em;
+	color: #000000;
+	padding: 4% 2%;
+	font-weight: 500;
+	text-shadow: 0 0 6px #ffffff, 0 0 12px #ffffff;
+	background: radial-gradient(
+		ellipse at center,
+		rgba(255, 255, 255, 0.96) 0%,
+		rgba(255, 255, 255, 0.82) 45%,
+		rgba(255, 255, 255, 0) 80%
+	);
+}
+
+.error-code {
+	font-size: clamp(14px, 1.4vw, 18px);
+	letter-spacing: -0.03em;
+	color: #000000;
+	margin-bottom: clamp(10px, 1.6vw, 20px);
+}
+
+.return-link {
+	margin-top: clamp(10px, 1.6vw, 20px);
+	font-size: clamp(9px, 1vw, 13px);
+	letter-spacing: -0.02em;
+	color: #000000;
+	text-decoration: none;
+	cursor: alias;
+	opacity: 0.6;
+	transition: opacity 0.2s ease;
+}
+
+.return-link:hover {
+	opacity: 1;
+}
+    
+.error-code {
+  ont-size: clamp(14px, 1.4vw, 18px);
+  letter-spacing: -0.03em;
+  color: #000000;
+  margin-bottom: clamp(10px, 1.6vw, 20px);
+}
+
+.return-link {
+  margin-top: clamp(10px, 1.6vw, 20px);
+  font-size: clamp(9px, 1vw, 13px);
+  letter-spacing: -0.02em;
+  color: #000000;
+  text-decoration: none;
+  cursor: alias;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.return-link:hover {
+  opacity: 1;
+}
   </style>
 </head>
 <body>
