@@ -1,3 +1,4 @@
+
 const playlist = [
   { title: "crystal castles - suffocation", src: "assets/track1.mp3" },
   { title: "snow strippers - tragic surprise", src: "assets/track2.mp3" },
@@ -102,6 +103,7 @@ function handleMusicClick(e) {
 }
 
 document.addEventListener('contextmenu', (e) => e.preventDefault());
+
 document.addEventListener('keydown', (e) => {
   if (e.key === 'F12') e.preventDefault();
 });
@@ -118,6 +120,13 @@ if (slider) {
 
 if (musicBtn) {
   musicBtn.addEventListener('click', handleMusicClick);
+
+  musicBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleMusicClick(e);
+    }
+  });
 }
 
 if (audio && timeText) {
