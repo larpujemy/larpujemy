@@ -271,7 +271,7 @@
     }
 
     .qr-frame.is-stale {
-      opacity: 0.35;
+      opacity: 0.28;
     }
 
     #qr-canvas {
@@ -461,7 +461,7 @@
 
   <main class="stage">
     <header class="header-bar">
-      <a href="/tools" class="back-link">[ <- tools ]</a>
+      <a href="/tools" class="back-link">[ &lt;- tools ]</a>
       <span class="header-title">larpujemy.pl / tools / qr</span>
     </header>
 
@@ -494,7 +494,7 @@
 
           <div class="input-slot">
             <div id="input-url-wrap">
-              <input type="url" id="input-url" class="raw-input" placeholder="https://larpujemy.pl" value="https://larpujemy.pl" autocomplete="off" spellcheck="false">
+              <input type="url" id="input-url" class="raw-input" placeholder="enter link..." autocomplete="off" spellcheck="false">
             </div>
 
             <div id="input-text-wrap" class="slot-hidden">
@@ -533,33 +533,34 @@
             <div class="section-label"><span>password (optional)</span></div>
             <input type="password" id="opt-password" class="raw-input" placeholder="leave empty for no password" autocomplete="new-password">
           </div>
-
-          <button type="button" class="primary-btn" id="btn-generate-temp">[ generate temporary qr ]</button>
         </div>
+
+        <!-- 4. Unified Generate Action (always visible in both modes) -->
+        <button type="button" class="primary-btn" id="btn-generate">[ generate qr code ]</button>
       </section>
 
-      <!-- RIGHT PANEL: LIVE QR & EXPORT -->
+      <!-- RIGHT PANEL: QR PREVIEW & EXPORT -->
       <section class="panel preview-panel" aria-label="QR code preview">
         <div class="section-label" style="width: 100%;">
           <span>qr code</span>
-          <span id="matrix-dims">25x25</span>
+          <span id="matrix-dims">--x--</span>
         </div>
 
         <div class="qr-box-wrapper">
-          <div class="qr-frame" id="qr-frame">
+          <div class="qr-frame is-stale" id="qr-frame">
             <canvas id="qr-canvas" width="340" height="340"></canvas>
           </div>
           <div class="qr-meta" id="qr-status">
-            [ standard · 20 bytes ]
+            [ enter content &amp; press generate ]
           </div>
         </div>
 
         <div class="actions-stack">
           <div class="action-row">
-            <button type="button" class="primary-btn" id="dl-png">[ download .png ]</button>
-            <button type="button" class="primary-btn" id="dl-svg">[ download .svg ]</button>
+            <button type="button" class="primary-btn" id="dl-png" disabled>[ download .png ]</button>
+            <button type="button" class="primary-btn" id="dl-svg" disabled>[ download .svg ]</button>
           </div>
-          <button type="button" class="primary-btn" id="copy-payload">[ copy content ]</button>
+          <button type="button" class="primary-btn" id="copy-qr" disabled>[ copy qr code ]</button>
         </div>
       </section>
     </div>
@@ -577,7 +578,7 @@
       <div class="vol-popover">
         <input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.3" aria-label="Volume">
       </div>
-      <span class="music-glyph" id="music-btn" role="button" aria-label="Play or pause music" tabindex="0">♪</span>
+      <span class="music-glyph" id="music-btn" role="button" aria-label="Play or pause music" tabindex="0">&#9834;</span>
     </div>
   </div>
 
@@ -588,9 +589,7 @@
       const state = {
         payloadType: 'url',
         mode: 'static',
-        lastEncoded: '',
-        qrInstance: null,
-        tempGenerated: false
+        qrInstance: null
       };
 
       const payloadBtns = document.querySelectorAll('#payload-type-group .opt-btn');
@@ -607,7 +606,7 @@
       const optBurn = document.getElementById('opt-burn');
       const optTtl = document.getElementById('opt-ttl');
       const optPassword = document.getElementById('opt-password');
-      const btnGenerateTemp = document.getElementById('btn-generate-temp');
+      const btnGenerate = document.getElementById('btn-generate');
 
       const qrFrame = document.getElementById('qr-frame');
       const qrCanvas = document.getElementById('qr-canvas');
@@ -616,7 +615,7 @@
 
       const dlPng = document.getElementById('dl-png');
       const dlSvg = document.getElementById('dl-svg');
-      const copyPayload = document.getElementById('copy-payload');
+      const copyQr = document.getElementById('copy-qr');
 
       function bytesToB64Url(bytes) {
         let bin = '';
@@ -661,17 +660,49 @@
         };
       }
 
-      function buildRawContent() {
-        if (state.payloadType === 'url') {
-          return inputUrl.value.trim() || 'https://larpujemy.pl';
-        }
-        return inputText.value.trim() || 'larpujemy.pl';
+      function getRawContent() {
+        return state.payloadType === 'url'
+          ? inputUrl.value.trim()
+          : inputText.value.trim();
       }
 
-      function drawMatrix(data, statusText, isStale = false) {
-        state.lastEncoded = data;
-        qrFrame.classList.toggle('is-stale', isStale);
+      function setExportEnabled(enabled) {
+        dlPng.disabled = !enabled;
+        dlSvg.disabled = !enabled;
+        copyQr.disabled = !enabled;
+      }
 
+      function renderHighResCanvas(qr, size = 1024) {
+        const count = qr.getModuleCount();
+        const margin = 2;
+        const total = count + margin * 2;
+        const scale = size / total;
+
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = size;
+        offCanvas.height = size;
+        const ctx = offCanvas.getContext('2d');
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, size, size);
+        ctx.fillStyle = '#000000';
+
+        for (let r = 0; r < count; r++) {
+          for (let c = 0; c < count; c++) {
+            if (qr.isDark(r, c)) {
+              ctx.fillRect(
+                Math.round((c + margin) * scale),
+                Math.round((r + margin) * scale),
+                Math.ceil(scale),
+                Math.ceil(scale)
+              );
+            }
+          }
+        }
+        return offCanvas;
+      }
+
+      function drawMatrix(data, statusText) {
         try {
           const qr = qrcode(0, 'M');
           qr.addData(data);
@@ -707,31 +738,60 @@
             }
           }
 
+          qrFrame.classList.remove('is-stale');
           qrStatus.textContent = statusText;
+          setExportEnabled(true);
         } catch (err) {
           qrStatus.textContent = '[ error: content too long ]';
         }
       }
 
-      function updateStaticOrMarkStale() {
-        if (state.mode === 'static') {
-          const data = buildRawContent();
-          drawMatrix(data, `[ standard · ${data.length} bytes ]`, false);
-          copyPayload.textContent = '[ copy content ]';
-        } else {
-          state.tempGenerated = false;
-          qrFrame.classList.add('is-stale');
-          qrStatus.textContent = '[ press generate to encrypt & create link ]';
-          copyPayload.textContent = '[ copy link ]';
-        }
+      function markStale() {
+        qrFrame.classList.add('is-stale');
+        qrStatus.textContent = '[ press generate qr code ]';
       }
 
-      btnGenerateTemp.addEventListener('click', async () => {
-        const content = buildRawContent();
-        if (!content) return;
+      // Draw decorative placeholder matrix on initial load
+      (function initPlaceholderMatrix() {
+        const qr = qrcode(0, 'M');
+        qr.addData('https://larpujemy.pl');
+        qr.make();
+        const count = qr.getModuleCount();
+        const margin = 2;
+        const total = count + margin * 2;
+        const size = 340;
+        const scale = size / total;
+        const ctx = qrCanvas.getContext('2d');
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, size, size);
+        ctx.fillStyle = '#ffffff';
+        for (let r = 0; r < count; r++) {
+          for (let c = 0; c < count; c++) {
+            if (qr.isDark(r, c)) {
+              ctx.fillRect(Math.round((c + margin) * scale), Math.round((r + margin) * scale), Math.ceil(scale), Math.ceil(scale));
+            }
+          }
+        }
+      })();
 
-        btnGenerateTemp.disabled = true;
-        btnGenerateTemp.textContent = '[ encrypting... ]';
+      btnGenerate.addEventListener('click', async () => {
+        const content = getRawContent();
+        if (!content) {
+          qrStatus.textContent = state.payloadType === 'url'
+            ? '[ error: enter link first ]'
+            : '[ error: enter text first ]';
+          (state.payloadType === 'url' ? inputUrl : inputText).focus();
+          return;
+        }
+
+        if (state.mode === 'static') {
+          drawMatrix(content, `[ standard · ${content.length} bytes ]`);
+          return;
+        }
+
+        // Temporary / Zero-Knowledge mode
+        btnGenerate.disabled = true;
+        btnGenerate.textContent = '[ encrypting... ]';
 
         try {
           const password = optPassword.value;
@@ -757,16 +817,14 @@
 
           const { id } = await res.json();
           const finalUrl = `${window.location.origin}/q/${id}#${encrypted.fragmentKey}`;
-
-          state.tempGenerated = true;
           const scanTxt = optBurn.value === '1' ? '1 scan' : (optBurn.value === '0' ? 'unlimited' : `${optBurn.value} scans`);
-          drawMatrix(finalUrl, `[ temporary · ${scanTxt} · ready ]`, false);
-          copyPayload.textContent = '[ copy link ]';
+
+          drawMatrix(finalUrl, `[ temporary · ${scanTxt} · ready ]`);
         } catch (err) {
           qrStatus.textContent = '[ error: worker unreachable ]';
         } finally {
-          btnGenerateTemp.disabled = false;
-          btnGenerateTemp.textContent = '[ generate temporary qr ]';
+          btnGenerate.disabled = false;
+          btnGenerate.textContent = '[ generate qr code ]';
         }
       });
 
@@ -778,7 +836,7 @@
 
           inputUrlWrap.classList.toggle('slot-hidden', state.payloadType !== 'url');
           inputTextWrap.classList.toggle('slot-hidden', state.payloadType !== 'text');
-          updateStaticOrMarkStale();
+          markStale();
         });
       });
 
@@ -792,46 +850,28 @@
           tempBox.classList.toggle('visible', isTemp);
           zkStatus.classList.toggle('invisible', !isTemp);
           footerNote.textContent = isTemp ? 'zero-knowledge' : 'client-side';
-          updateStaticOrMarkStale();
+          markStale();
         });
       });
 
       [inputUrl, inputText, optBurn, optTtl, optPassword].forEach(el => {
-        el.addEventListener('input', updateStaticOrMarkStale);
-        el.addEventListener('change', updateStaticOrMarkStale);
+        el.addEventListener('input', markStale);
+        el.addEventListener('change', markStale);
+      });
+
+      // Allow pressing Enter in single-line inputs to trigger generate
+      [inputUrl, optPassword].forEach(el => {
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            btnGenerate.click();
+          }
+        });
       });
 
       dlPng.addEventListener('click', () => {
         if (!state.qrInstance) return;
-        const qr = state.qrInstance;
-        const count = qr.getModuleCount();
-        const margin = 2;
-        const total = count + margin * 2;
-        const size = 1024;
-        const scale = size / total;
-
-        const offCanvas = document.createElement('canvas');
-        offCanvas.width = size;
-        offCanvas.height = size;
-        const ctx = offCanvas.getContext('2d');
-
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, size, size);
-        ctx.fillStyle = '#000000';
-
-        for (let r = 0; r < count; r++) {
-          for (let c = 0; c < count; c++) {
-            if (qr.isDark(r, c)) {
-              ctx.fillRect(
-                Math.round((c + margin) * scale),
-                Math.round((r + margin) * scale),
-                Math.ceil(scale),
-                Math.ceil(scale)
-              );
-            }
-          }
-        }
-
+        const offCanvas = renderHighResCanvas(state.qrInstance, 1024);
         const link = document.createElement('a');
         link.download = `larpujemy-qr-${Date.now()}.png`;
         link.href = offCanvas.toDataURL('image/png');
@@ -865,18 +905,22 @@
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       });
 
-      copyPayload.addEventListener('click', async () => {
-        if (!state.lastEncoded) return;
+      copyQr.addEventListener('click', async () => {
+        if (!state.qrInstance) return;
+        const prev = copyQr.textContent;
         try {
-          await navigator.clipboard.writeText(state.lastEncoded);
-          const prev = copyPayload.textContent;
-          copyPayload.textContent = '[ copied! ]';
-          setTimeout(() => { copyPayload.textContent = prev; }, 1400);
-        } catch (e) {}
+          const offCanvas = renderHighResCanvas(state.qrInstance, 1024);
+          const blob = await new Promise(resolve => offCanvas.toBlob(resolve, 'image/png'));
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+          copyQr.textContent = '[ copied qr! ]';
+        } catch (err) {
+          copyQr.textContent = '[ copy blocked by browser ]';
+        } finally {
+          setTimeout(() => { copyQr.textContent = prev; }, 1600);
+        }
       });
-
-      // Initial static render
-      updateStaticOrMarkStale();
     })();
   </script>
 </body>
