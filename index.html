@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,241 +7,252 @@
   <meta name="description" content="flyest white boy of em all">
   <style>
     * {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-	cursor: crosshair;
-	user-select: none;
-}
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      cursor: crosshair;
+      user-select: none;
+    }
 
-html {
-	background-color: #ffffff;
-	filter: invert(1);
-}
+    html {
+      background-color: #ffffff;
+      filter: invert(1);
+    }
 
-body {
-	background-color: #ffffff;
-	color: #ffffff;
-	font-family: "Courier New", Courier, monospace;
-	min-height: 100vh;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	position: relative;
-}
+    body {
+      background-color: #ffffff;
+      color: #000000;
+      font-family: "Courier New", Courier, monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+    }
 
-html, body {
-	height: 100vh;
-	overflow: hidden;
-	overscroll-behavior: none;
-	touch-action: none;
-}
+    html, body {
+      height: 100vh;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: none;
+    }
 
-.stage {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: clamp(220px, 32vw, 420px);
-	max-width: 100%;
-	min-width: 0;
-}
+    .stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: clamp(260px, 34vw, 600px);
+      max-width: 92vw;
+      min-width: 0;
+      transform: translateZ(0);
+    }
 
-.butterfly-frame {
-	position: relative;
-	width: 100%;
-	line-height: 0;
-}
+    .butterfly-frame {
+      position: relative;
+      width: 100%;
+      line-height: 0;
+    }
 
-.butterfly-img {
-	width: 100%;
-	height: auto;
-	display: block;
-	pointer-events: none;
-}
+    .butterfly-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      pointer-events: none;
+      backface-visibility: hidden;
+    }
 
-.quote {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 82%;
-	text-align: center;
-	font-size: clamp(9px, 1.15vw, 15px);
-	line-height: 1.3;
-	letter-spacing: -0.03em;
-	color: #000000;
-	padding: 4% 2%;
-	font-weight: 500;
-	text-shadow: 0 0 6px #ffffff, 0 0 12px #ffffff;
-	background: radial-gradient(
-		ellipse at center,
-		rgba(255, 255, 255, 0.96) 0%,
-		rgba(255, 255, 255, 0.82) 45%,
-		rgba(255, 255, 255, 0) 80%
-	);
-}
+    .quote {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) translateZ(0);
+      width: 84%;
+      text-align: center;
+      font-size: clamp(11px, 1.15vw, 20px);
+      line-height: 1.35;
+      letter-spacing: -0.03em;
+      color: #000000;
+      padding: 4% 2%;
+      font-weight: 500;
+      text-shadow: 0 0 8px #ffffff, 0 0 14px #ffffff;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(255, 255, 255, 0.96) 0%,
+        rgba(255, 255, 255, 0.84) 48%,
+        rgba(255, 255, 255, 0) 80%
+      );
+    }
 
-.marquee-box {
-	width: 100%;
-	max-width: 100%;
-	overflow: hidden;
-	display: flex;
-	white-space: nowrap;
-	margin-top: clamp(-20px, -2.5vw, -8px);
-	opacity: 0.6;
-	mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-	-webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-}
+    .marquee-box {
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+      display: flex;
+      white-space: nowrap;
+      margin-top: clamp(-24px, -2vw, -10px);
+      opacity: 0.65;
+      mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+      -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+      transform: translateZ(0);
+    }
 
-.links {
-	display: flex;
-	justify-content: center;
-	gap: 1.2vw;
-	margin-top: clamp(8px, 1.2vw, 14px);
-	font-size: clamp(9px, 1vw, 13px);
-	letter-spacing: -0.02em;
-	white-space: nowrap;
-}
+    .marquee-track {
+      display: flex;
+      flex-shrink: 0;
+      min-width: 100%;
+      font-size: clamp(10px, 0.85vw, 14px);
+      letter-spacing: -0.02em;
+      color: #000000;
+      animation: marquee-scroll 18s linear infinite;
+      will-change: transform;
+    }
 
-.marquee-track {
-	display: flex;
-	flex-shrink: 0;
-	min-width: 100%;
-	font-size: clamp(8px, 0.85vw, 11px);
-	letter-spacing: -0.02em;
-	color: #000000;
-	animation: marquee-scroll 18s linear infinite;
-}
+    .marquee-track span {
+      white-space: nowrap;
+    }
 
-.marquee-track span {
-	white-space: nowrap;
-}
+    @keyframes marquee-scroll {
+      0% {
+        transform: translate3d(0, 0, 0);
+      }
+      100% {
+        transform: translate3d(-100%, 0, 0);
+      }
+    }
 
-@keyframes marquee-scroll {
-	0% {
-		transform: translateX(0);
-	}
-	100% {
-		transform: translateX(-100%);
-	}
-}
+    .links {
+      display: flex;
+      justify-content: center;
+      gap: clamp(14px, 1.5vw, 26px);
+      margin-top: clamp(12px, 1.3vw, 22px);
+      font-size: clamp(11px, 1vw, 16px);
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
 
-.links > a {
-	color: #000000;
-	text-decoration: none;
-	cursor: alias;
-}
+    .links > a {
+      color: #000000;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+    }
 
-.audio-widget {
-	position: fixed;
-	bottom: clamp(16px, 2.5vw, 32px);
-	right: clamp(16px, 2.5vw, 32px);
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	font-family: monospace;
-	user-select: none;
-	z-index: 1000;
-}
+    .links > a:hover {
+      opacity: 0.6;
+    }
 
-.player-info {
-	display: none;
-	align-items: center;
-	gap: 10px;
-}
+    .audio-widget {
+      position: fixed;
+      bottom: clamp(18px, 2.5vw, 38px);
+      right: clamp(18px, 2.5vw, 38px);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: monospace;
+      user-select: none;
+      z-index: 1000;
+      transform: translateZ(0);
+    }
 
-.audio-widget.playing .player-info {
-	display: flex;
-}
+    .player-info {
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
 
-.track-title,
-.track-time {
-	font-size: 10px;
-	letter-spacing: -0.02em;
-	color: #000000;
-	opacity: 0.55;
-	white-space: nowrap;
-}
+    .audio-widget.playing .player-info {
+      display: flex;
+    }
 
-.glyph-container {
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
+    .track-title,
+    .track-time {
+      font-size: clamp(10px, 0.8vw, 13px);
+      letter-spacing: -0.02em;
+      color: #000000;
+      opacity: 0.6;
+      white-space: nowrap;
+    }
 
-.vol-popover {
-	position: absolute;
-	bottom: 100%;
-	left: 50%;
-	transform: translateX(-50%);
-	padding-bottom: 28px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	opacity: 0;
-	pointer-events: none;
-	transition: opacity 0.2s ease;
-}
+    .glyph-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-.audio-widget.playing .glyph-container:hover .vol-popover {
-	opacity: 1;
-	pointer-events: auto;
-}
+    .vol-popover {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
 
-#vol-slider {
-	-webkit-appearance: none;
-	appearance: none;
-	width: 50px;
-	height: 2px;
-	background: #000000;
-	outline: none;
-	cursor: crosshair;
-	transform: rotate(-90deg);
-	opacity: 0.55;
-}
+    .audio-widget.playing .glyph-container:hover .vol-popover {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
-#vol-slider::-webkit-slider-thumb {
-	-webkit-appearance: none;
-	width: 6px;
-	height: 6px;
-	background: #000000;
-	border-radius: 0;
-	cursor: crosshair;
-}
+    #vol-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: clamp(50px, 4vw, 68px);
+      height: 2px;
+      background: #000000;
+      outline: none;
+      cursor: pointer;
+      transform: rotate(-90deg);
+      opacity: 0.6;
+    }
 
-#vol-slider::-moz-range-thumb {
-	width: 6px;
-	height: 6px;
-	background: #000000;
-	border: none;
-	border-radius: 0;
-	cursor: crosshair;
-}
+    #vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 7px;
+      height: 7px;
+      background: #000000;
+      border-radius: 0;
+      cursor: pointer;
+    }
 
-.music-glyph {
-	font-size: clamp(14px, 1.3vw, 18px);
-	line-height: 1;
-	color: #000000;
-	cursor: crosshair;
-	opacity: 0.35;
-	transition: opacity 0.2s ease;
-	touch-action: manipulation;
-}
+    #vol-slider::-moz-range-thumb {
+      width: 7px;
+      height: 7px;
+      background: #000000;
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
+    }
 
-.glyph-container:hover .music-glyph {
-	opacity: 1;
-}
+    .music-glyph {
+      font-size: clamp(16px, 1.35vw, 24px);
+      line-height: 1;
+      color: #000000;
+      cursor: pointer;
+      opacity: 0.4;
+      transition: opacity 0.2s ease;
+      touch-action: manipulation;
+    }
 
-@media (hover: none) and (pointer: coarse) {
-	.audio-widget.playing .vol-popover {
-		opacity: 1;
-		pointer-events: auto;
-	}
-}
-    
-/* made by larpujemy :& */
+    .glyph-container:hover .music-glyph {
+      opacity: 1;
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      .audio-widget.playing .vol-popover {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+
+    /* made by larpujemy :& */
   </style>
 </head>
 <body>
@@ -268,6 +278,7 @@ html, body {
 
     <nav class="links">
       <a href="https://discord.com/users/1466510566385254557" target="_blank" rel="noopener noreferrer">[ catch me ]</a>
+      <a href="/tools">[ tools ]</a>
     </nav>
   </main>
 
