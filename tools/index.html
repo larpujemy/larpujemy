@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>larpujemy.pl — tools</title>
+  <meta name="description" content="utility suite by larpujemy">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      cursor: crosshair;
+      user-select: none;
+    }
+
+    html {
+      background-color: #ffffff;
+      filter: invert(1);
+    }
+
+    body {
+      background-color: #ffffff;
+      color: #000000;
+      font-family: "Courier New", Courier, monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 24px 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html, body {
+      height: 100vh;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: none;
+    }
+
+    .stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: clamp(300px, 38vw, 680px);
+      max-width: 92vw;
+      transform: translateZ(0);
+    }
+
+    .header-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: clamp(16px, 2vw, 28px);
+      font-size: clamp(11px, 0.95vw, 15px);
+      letter-spacing: -0.02em;
+    }
+
+    .header-title {
+      opacity: 0.55;
+    }
+
+    .back-link {
+      color: #000000;
+      text-decoration: none;
+      cursor: alias;
+      opacity: 0.85;
+      transition: opacity 0.15s ease;
+    }
+
+    .back-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
+    .tools-stack {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(10px, 1.1vw, 16px);
+    }
+
+    .tool-card {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: clamp(14px, 1.5vw, 22px) clamp(16px, 1.8vw, 26px);
+      border: 1px solid rgba(0, 0, 0, 0.35);
+      background-color: transparent;
+      color: #000000;
+      text-decoration: none;
+      cursor: alias;
+      transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+
+    .tool-card:hover {
+      background-color: #000000;
+      color: #ffffff;
+      border-color: #000000;
+    }
+
+    .tool-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .tool-name {
+      font-size: clamp(13px, 1.15vw, 18px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tool-desc {
+      font-size: clamp(10px, 0.85vw, 13px);
+      letter-spacing: -0.02em;
+      opacity: 0.58;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tool-card:hover .tool-desc {
+      opacity: 0.78;
+    }
+
+    .tool-meta {
+      font-size: clamp(10px, 0.9vw, 14px);
+      letter-spacing: -0.02em;
+      opacity: 0.5;
+      margin-left: 16px;
+      flex-shrink: 0;
+    }
+
+    .tool-card:hover .tool-meta {
+      opacity: 1;
+    }
+
+    .tool-card.is-empty {
+      border-style: dashed;
+      border-color: rgba(0, 0, 0, 0.25);
+      opacity: 0.42;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .footer-note {
+      width: 100%;
+      margin-top: clamp(16px, 2vw, 28px);
+      font-size: clamp(10px, 0.8vw, 13px);
+      letter-spacing: -0.02em;
+      opacity: 0.42;
+      text-align: center;
+    }
+
+    /* Identical Audio Widget */
+    .audio-widget {
+      position: fixed;
+      bottom: clamp(18px, 2.5vw, 38px);
+      right: clamp(18px, 2.5vw, 38px);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: monospace;
+      user-select: none;
+      z-index: 1000;
+      transform: translateZ(0);
+    }
+
+    .player-info {
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .audio-widget.playing .player-info {
+      display: flex;
+    }
+
+    .track-title,
+    .track-time {
+      font-size: clamp(10px, 0.8vw, 13px);
+      letter-spacing: -0.02em;
+      color: #000000;
+      opacity: 0.6;
+      white-space: nowrap;
+    }
+
+    .glyph-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vol-popover {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .audio-widget.playing .glyph-container:hover .vol-popover {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #vol-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: clamp(50px, 4vw, 68px);
+      height: 2px;
+      background: #000000;
+      outline: none;
+      cursor: crosshair;
+      transform: rotate(-90deg);
+      opacity: 0.6;
+    }
+
+    #vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 7px;
+      height: 7px;
+      background: #000000;
+      border-radius: 0;
+      cursor: crosshair;
+    }
+
+    #vol-slider::-moz-range-thumb {
+      width: 7px;
+      height: 7px;
+      background: #000000;
+      border: none;
+      border-radius: 0;
+      cursor: crosshair;
+    }
+
+    .music-glyph {
+      font-size: clamp(16px, 1.35vw, 24px);
+      line-height: 1;
+      color: #000000;
+      cursor: crosshair;
+      opacity: 0.4;
+      transition: opacity 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .glyph-container:hover .music-glyph {
+      opacity: 1;
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      .audio-widget.playing .vol-popover {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+
+    /* made by larpujemy :& */
+  </style>
+</head>
+<body>
+
+  <main class="stage">
+    <header class="header-bar">
+      <a href="/" class="back-link">[ &lt;- back ]</a>
+      <span class="header-title">larpujemy.pl / tools</span>
+    </header>
+
+    <section class="tools-stack" aria-label="Available tools">
+      <a href="/tools/metadata" class="tool-card">
+        <div class="tool-left">
+          <span class="tool-name">metadata cleaner</span>
+          <span class="tool-desc">strip exif, gps &amp; device tags locally</span>
+        </div>
+        <span class="tool-meta">[ 01 -&gt; ]</span>
+      </a>
+
+      <a href="/tools/qr.html" class="tool-card">
+        <div class="tool-left">
+          <span class="tool-name">qr code generator</span>
+          <span class="tool-desc">raw svg / png matrix encoding</span>
+        </div>
+        <span class="tool-meta">[ 02 -&gt; ]</span>
+      </a>
+
+      <div class="tool-card is-empty" aria-disabled="true">
+        <div class="tool-left">
+          <span class="tool-name">X</span>
+          <span class="tool-desc">module in development</span>
+        </div>
+        <span class="tool-meta">[ 03 // null ]</span>
+      </div>
+
+      <a href="https://transfer.larpujemy.pl" target="_blank" rel="noopener noreferrer" class="tool-card">
+        <div class="tool-left">
+          <span class="tool-name">file transfer</span>
+          <span class="tool-desc">zero-knowledge encrypted p2p / edge drop</span>
+        </div>
+        <span class="tool-meta">[ 04 -&gt; ]</span>
+      </a>
+    </section>
+
+    <p class="footer-note">client-side &amp; zero-log utilities</p>
+  </main>
+
+  <div class="audio-widget" id="audio-widget">
+    <div class="player-info" id="player-info">
+      <span class="track-title" id="track-title"></span>
+      <span class="track-time" id="track-time">[ 0:00 / 0:00 ]</span>
+    </div>
+
+    <div class="glyph-container">
+      <div class="vol-popover">
+        <input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.3" aria-label="Volume">
+      </div>
+      <span class="music-glyph" id="music-btn" role="button" aria-label="Play or pause music" tabindex="0">&#9834;</span>
+    </div>
+  </div>
+
+  <audio id="main-audio"></audio>
+  <script src="/script.js" defer></script>
+</body>
+</html>
