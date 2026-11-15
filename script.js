@@ -1,13 +1,13 @@
 
 const playlist = [
-  { title: "crystal castles - suffocation", src: "assets/track1.mp3" },
-  { title: "snow strippers - tragic surprise", src: "assets/track2.mp3" },
-  { title: "cult member - u weren't here i really miss you", src: "assets/track3.mp3" },
-  { title: "smokedope2016 - im not god but i wish i was", src: "assets/track4.mp3" },
-  { title: "bladee - reality surf", src: "assets/track5.mp3" },
-  { title: "buckshot - calm des fckdown", src: "assets/track6.mp3" },
-  { title: "ecco2k - in the flesh", src: "assets/track7.mp3" },
-  { title: "yung lean - afghanistan", src: "assets/track8.mp3" }
+  { title: "crystal castles - suffocation", src: "/assets/track1.mp3" },
+  { title: "snow strippers - tragic surprise", src: "/assets/track2.mp3" },
+  { title: "cult member - u weren't here i really miss you", src: "/assets/track3.mp3" },
+  { title: "smokedope2016 - im not god but i wish i was", src: "/assets/track4.mp3" },
+  { title: "bladee - reality surf", src: "/assets/track5.mp3" },
+  { title: "buckshot - calm des fckdown", src: "/assets/track6.mp3" },
+  { title: "ecco2k - in the flesh", src: "/assets/track7.mp3" },
+  { title: "yung lean - afghanistan", src: "/assets/track8.mp3" }
 ];
 
 const doubleClickWindow = 350;
