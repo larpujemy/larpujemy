@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>larpujemy.pl — qr generator</title>
+  <meta name="description" content="qr code generator by larpujemy">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      cursor: crosshair;
+      user-select: none;
+    }
+
+    html {
+      background-color: #ffffff;
+      filter: invert(1);
+    }
+
+    body {
+      background-color: #ffffff;
+      color: #000000;
+      font-family: "Courier New", Courier, monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: clamp(24px, 3.5vw, 56px) 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html, body {
+      overflow-x: hidden;
+      overscroll-behavior: none;
+    }
+
+    .stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: clamp(340px, 76vw, 1280px);
+      max-width: 95vw;
+      transform: translateZ(0);
+    }
+
+    .header-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: clamp(20px, 2.5vw, 36px);
+      font-size: clamp(14px, 1.25vw, 20px);
+      letter-spacing: -0.02em;
+    }
+
+    .header-title {
+      opacity: 0.55;
+    }
+
+    .back-link {
+      color: #000000;
+      text-decoration: none;
+      cursor: alias;
+      opacity: 0.85;
+      transition: opacity 0.15s ease;
+    }
+
+    .back-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
+    /* Main 2-column workspace */
+    .workspace {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: clamp(20px, 2.4vw, 36px);
+      align-items: stretch;
+    }
+
+    @media (max-width: 900px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      border: 1px solid rgba(0, 0, 0, 0.35);
+      padding: clamp(22px, 2.5vw, 38px);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: clamp(20px, 2.2vw, 30px);
+      background: transparent;
+    }
+
+    .section-label {
+      font-size: clamp(13px, 1.05vw, 16px);
+      letter-spacing: -0.02em;
+      opacity: 0.6;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .zk-tag {
+      font-weight: 700;
+      opacity: 1;
+    }
+
+    /* Segmented button groups */
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .opt-btn {
+      background: transparent;
+      color: #000000;
+      border: 1px solid rgba(0, 0, 0, 0.35);
+      padding: clamp(10px, 0.9vw, 15px) clamp(16px, 1.4vw, 24px);
+      font-family: inherit;
+      font-size: clamp(13px, 1.1vw, 17px);
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      cursor: alias;
+      transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+
+    .opt-btn:hover {
+      border-color: #000000;
+    }
+
+    .opt-btn.active {
+      background: #000000;
+      color: #ffffff;
+      border-color: #000000;
+      font-weight: 700;
+    }
+
+    /* Inputs */
+    .field-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .raw-input,
+    .raw-select {
+      width: 100%;
+      background: transparent;
+      color: #000000;
+      border: 1px solid rgba(0, 0, 0, 0.35);
+      padding: clamp(12px, 1.1vw, 18px) clamp(14px, 1.3vw, 20px);
+      font-family: "Courier New", Courier, monospace;
+      font-size: clamp(14px, 1.15vw, 18px);
+      letter-spacing: -0.02em;
+      outline: none;
+      border-radius: 0;
+      cursor: text;
+      user-select: text;
+      transition: border-color 0.12s ease;
+    }
+
+    .raw-input:focus,
+    .raw-select:focus {
+      border-color: #000000;
+    }
+
+    .raw-input::placeholder {
+      color: rgba(0, 0, 0, 0.38);
+    }
+
+    .raw-select {
+      cursor: alias;
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 36px;
+      background-image: linear-gradient(45deg, transparent 50%, #000 50%), linear-gradient(135deg, #000 50%, transparent 50%);
+      background-position: calc(100% - 18px) calc(50% - 3px), calc(100% - 12px) calc(50% - 3px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+
+    textarea.raw-input {
+      resize: none;
+      height: 110px;
+      line-height: 1.45;
+    }
+
+    /* Stacked input slot so switching link <-> text never jumps height */
+    .input-slot {
+      display: grid;
+      align-items: start;
+    }
+
+    .input-slot > * {
+      grid-area: 1 / 1;
+    }
+
+    .slot-hidden {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Temporary / Zero-Knowledge drawer — reserves space permanently so layout never shifts */
+    .temp-box {
+      border-top: 1px dashed rgba(0, 0, 0, 0.28);
+      padding-top: clamp(18px, 2vw, 28px);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(16px, 1.6vw, 22px);
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .temp-box.visible {
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .invisible {
+      visibility: hidden;
+    }
+
+    /* Right column: QR preview & actions */
+    .preview-panel {
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+    }
+
+    .qr-box-wrapper {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-grow: 1;
+      padding: 12px 0;
+    }
+
+    .qr-frame {
+      border: 1px solid rgba(0, 0, 0, 0.35);
+      padding: clamp(14px, 1.5vw, 22px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #000000;
+      transition: opacity 0.15s ease;
+    }
+
+    .qr-frame.is-stale {
+      opacity: 0.35;
+    }
+
+    #qr-canvas {
+      display: block;
+      width: clamp(230px, 21vw, 340px);
+      height: clamp(230px, 21vw, 340px);
+      image-rendering: pixelated;
+    }
+
+    .qr-meta {
+      margin-top: 16px;
+      font-size: clamp(12px, 0.95vw, 15px);
+      opacity: 0.65;
+      letter-spacing: -0.02em;
+      line-height: 1.4;
+      word-break: break-all;
+    }
+
+    .actions-stack {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .action-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .primary-btn {
+      width: 100%;
+      background: transparent;
+      color: #000000;
+      border: 1px solid rgba(0, 0, 0, 0.45);
+      padding: clamp(12px, 1.1vw, 16px) 14px;
+      font-family: inherit;
+      font-size: clamp(13px, 1.05vw, 16px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      cursor: alias;
+      transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+
+    .primary-btn:hover:not(:disabled) {
+      background: #000000;
+      color: #ffffff;
+      border-color: #000000;
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .footer-note {
+      width: 100%;
+      margin-top: clamp(20px, 2.2vw, 32px);
+      font-size: clamp(12px, 0.95vw, 15px);
+      letter-spacing: -0.02em;
+      opacity: 0.45;
+      text-align: center;
+    }
+
+    /* Identical Audio Widget */
+    .audio-widget {
+      position: fixed;
+      bottom: clamp(18px, 2.5vw, 38px);
+      right: clamp(18px, 2.5vw, 38px);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: monospace;
+      user-select: none;
+      z-index: 1000;
+      transform: translateZ(0);
+    }
+
+    .player-info {
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .audio-widget.playing .player-info {
+      display: flex;
+    }
+
+    .track-title,
+    .track-time {
+      font-size: clamp(11px, 0.85vw, 14px);
+      letter-spacing: -0.02em;
+      color: #000000;
+      opacity: 0.6;
+      white-space: nowrap;
+    }
+
+    .glyph-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vol-popover {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .audio-widget.playing .glyph-container:hover .vol-popover {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #vol-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: clamp(50px, 4vw, 68px);
+      height: 2px;
+      background: #000000;
+      outline: none;
+      cursor: crosshair;
+      transform: rotate(-90deg);
+      opacity: 0.6;
+    }
+
+    #vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 7px;
+      height: 7px;
+      background: #000000;
+      border-radius: 0;
+      cursor: crosshair;
+    }
+
+    #vol-slider::-moz-range-thumb {
+      width: 7px;
+      height: 7px;
+      background: #000000;
+      border: none;
+      border-radius: 0;
+      cursor: crosshair;
+    }
+
+    .music-glyph {
+      font-size: clamp(16px, 1.35vw, 24px);
+      line-height: 1;
+      color: #000000;
+      cursor: crosshair;
+      opacity: 0.4;
+      transition: opacity 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .glyph-container:hover .music-glyph {
+      opacity: 1;
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      .audio-widget.playing .vol-popover {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+
+    /* made by larpujemy :& */
+  </style>
+</head>
+<body>
+
+  <main class="stage">
+    <header class="header-bar">
+      <a href="/tools" class="back-link">[ <- tools ]</a>
+      <span class="header-title">larpujemy.pl / tools / qr</span>
+    </header>
+
+    <div class="workspace">
+      <!-- LEFT PANEL: INPUTS & OPTIONS -->
+      <section class="panel" aria-label="QR configuration">
+        <!-- 1. Mode at the top -->
+        <div>
+          <div class="section-label">
+            <span>mode</span>
+            <span id="zk-status" class="zk-tag invisible">zero-knowledge</span>
+          </div>
+          <div class="btn-group" id="lifecycle-group">
+            <button type="button" class="opt-btn active" data-mode="static">[ standard ]</button>
+            <button type="button" class="opt-btn" data-mode="temporary">[ temporary ]</button>
+          </div>
+        </div>
+
+        <!-- 2. Content Type & Input -->
+        <div class="field-stack">
+          <div>
+            <div class="section-label">
+              <span>type</span>
+            </div>
+            <div class="btn-group" id="payload-type-group">
+              <button type="button" class="opt-btn active" data-type="url">[ link ]</button>
+              <button type="button" class="opt-btn" data-type="text">[ text ]</button>
+            </div>
+          </div>
+
+          <div class="input-slot">
+            <div id="input-url-wrap">
+              <input type="url" id="input-url" class="raw-input" placeholder="https://larpujemy.pl" value="https://larpujemy.pl" autocomplete="off" spellcheck="false">
+            </div>
+
+            <div id="input-text-wrap" class="slot-hidden">
+              <textarea id="input-text" class="raw-input" placeholder="enter text or note..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Temporary / Zero-Knowledge Controls (space reserved, never jumps) -->
+        <div class="temp-box" id="temp-box">
+          <div class="grid-2">
+            <div>
+              <div class="section-label"><span>scan limit</span></div>
+              <select id="opt-burn" class="raw-select">
+                <option value="1">1 scan (self-destruct)</option>
+                <option value="3">3 scans</option>
+                <option value="5">5 scans</option>
+                <option value="10">10 scans</option>
+                <option value="0">unlimited</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="section-label"><span>expiration time</span></div>
+              <select id="opt-ttl" class="raw-select">
+                <option value="600">10 minutes</option>
+                <option value="3600" selected>1 hour</option>
+                <option value="86400">24 hours</option>
+                <option value="604800">7 days</option>
+                <option value="0">never</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-label"><span>password (optional)</span></div>
+            <input type="password" id="opt-password" class="raw-input" placeholder="leave empty for no password" autocomplete="new-password">
+          </div>
+
+          <button type="button" class="primary-btn" id="btn-generate-temp">[ generate temporary qr ]</button>
+        </div>
+      </section>
+
+      <!-- RIGHT PANEL: LIVE QR & EXPORT -->
+      <section class="panel preview-panel" aria-label="QR code preview">
+        <div class="section-label" style="width: 100%;">
+          <span>qr code</span>
+          <span id="matrix-dims">25x25</span>
+        </div>
+
+        <div class="qr-box-wrapper">
+          <div class="qr-frame" id="qr-frame">
+            <canvas id="qr-canvas" width="340" height="340"></canvas>
+          </div>
+          <div class="qr-meta" id="qr-status">
+            [ standard · 20 bytes ]
+          </div>
+        </div>
+
+        <div class="actions-stack">
+          <div class="action-row">
+            <button type="button" class="primary-btn" id="dl-png">[ download .png ]</button>
+            <button type="button" class="primary-btn" id="dl-svg">[ download .svg ]</button>
+          </div>
+          <button type="button" class="primary-btn" id="copy-payload">[ copy content ]</button>
+        </div>
+      </section>
+    </div>
+
+    <p class="footer-note" id="footer-note">client-side</p>
+  </main>
+
+  <div class="audio-widget" id="audio-widget">
+    <div class="player-info" id="player-info">
+      <span class="track-title" id="track-title"></span>
+      <span class="track-time" id="track-time">[ 0:00 / 0:00 ]</span>
+    </div>
+
+    <div class="glyph-container">
+      <div class="vol-popover">
+        <input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.3" aria-label="Volume">
+      </div>
+      <span class="music-glyph" id="music-btn" role="button" aria-label="Play or pause music" tabindex="0">♪</span>
+    </div>
+  </div>
+
+  <audio id="main-audio"></audio>
+  <script src="/script.js" defer></script>
+  <script>
+    (function () {
+      const state = {
+        payloadType: 'url',
+        mode: 'static',
+        lastEncoded: '',
+        qrInstance: null,
+        tempGenerated: false
+      };
+
+      const payloadBtns = document.querySelectorAll('#payload-type-group .opt-btn');
+      const lifecycleBtns = document.querySelectorAll('#lifecycle-group .opt-btn');
+
+      const inputUrlWrap = document.getElementById('input-url-wrap');
+      const inputTextWrap = document.getElementById('input-text-wrap');
+      const inputUrl = document.getElementById('input-url');
+      const inputText = document.getElementById('input-text');
+
+      const tempBox = document.getElementById('temp-box');
+      const zkStatus = document.getElementById('zk-status');
+      const footerNote = document.getElementById('footer-note');
+      const optBurn = document.getElementById('opt-burn');
+      const optTtl = document.getElementById('opt-ttl');
+      const optPassword = document.getElementById('opt-password');
+      const btnGenerateTemp = document.getElementById('btn-generate-temp');
+
+      const qrFrame = document.getElementById('qr-frame');
+      const qrCanvas = document.getElementById('qr-canvas');
+      const qrStatus = document.getElementById('qr-status');
+      const matrixDims = document.getElementById('matrix-dims');
+
+      const dlPng = document.getElementById('dl-png');
+      const dlSvg = document.getElementById('dl-svg');
+      const copyPayload = document.getElementById('copy-payload');
+
+      function bytesToB64Url(bytes) {
+        let bin = '';
+        for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+        return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      }
+
+      async function encryptZeroKnowledge(payloadObj, password) {
+        const rawKeyBytes = crypto.getRandomValues(new Uint8Array(32));
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        let salt = null;
+        let aesKey;
+
+        if (password) {
+          salt = crypto.getRandomValues(new Uint8Array(16));
+          const enc = new TextEncoder();
+          const passBytes = enc.encode(password);
+          const combined = new Uint8Array(rawKeyBytes.length + passBytes.length);
+          combined.set(rawKeyBytes, 0);
+          combined.set(passBytes, rawKeyBytes.length);
+
+          const baseKey = await crypto.subtle.importKey('raw', combined, 'PBKDF2', false, ['deriveKey']);
+          aesKey = await crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+            baseKey,
+            { name: 'AES-GCM', length: 256 },
+            false,
+            ['encrypt']
+          );
+        } else {
+          aesKey = await crypto.subtle.importKey('raw', rawKeyBytes, { name: 'AES-GCM' }, false, ['encrypt']);
+        }
+
+        const encoded = new TextEncoder().encode(JSON.stringify(payloadObj));
+        const cipherBuffer = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, aesKey, encoded);
+
+        return {
+          ciphertext: bytesToB64Url(new Uint8Array(cipherBuffer)),
+          iv: bytesToB64Url(iv),
+          salt: salt ? bytesToB64Url(salt) : null,
+          fragmentKey: bytesToB64Url(rawKeyBytes)
+        };
+      }
+
+      function buildRawContent() {
+        if (state.payloadType === 'url') {
+          return inputUrl.value.trim() || 'https://larpujemy.pl';
+        }
+        return inputText.value.trim() || 'larpujemy.pl';
+      }
+
+      function drawMatrix(data, statusText, isStale = false) {
+        state.lastEncoded = data;
+        qrFrame.classList.toggle('is-stale', isStale);
+
+        try {
+          const qr = qrcode(0, 'M');
+          qr.addData(data);
+          qr.make();
+          state.qrInstance = qr;
+
+          const count = qr.getModuleCount();
+          matrixDims.textContent = `${count}x${count}`;
+
+          const margin = 2;
+          const totalModules = count + margin * 2;
+          const size = 340;
+          const scale = size / totalModules;
+
+          const ctx = qrCanvas.getContext('2d');
+          qrCanvas.width = size;
+          qrCanvas.height = size;
+
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(0, 0, size, size);
+
+          ctx.fillStyle = '#ffffff';
+          for (let r = 0; r < count; r++) {
+            for (let c = 0; c < count; c++) {
+              if (qr.isDark(r, c)) {
+                ctx.fillRect(
+                  Math.round((c + margin) * scale),
+                  Math.round((r + margin) * scale),
+                  Math.ceil(scale),
+                  Math.ceil(scale)
+                );
+              }
+            }
+          }
+
+          qrStatus.textContent = statusText;
+        } catch (err) {
+          qrStatus.textContent = '[ error: content too long ]';
+        }
+      }
+
+      function updateStaticOrMarkStale() {
+        if (state.mode === 'static') {
+          const data = buildRawContent();
+          drawMatrix(data, `[ standard · ${data.length} bytes ]`, false);
+          copyPayload.textContent = '[ copy content ]';
+        } else {
+          state.tempGenerated = false;
+          qrFrame.classList.add('is-stale');
+          qrStatus.textContent = '[ press generate to encrypt & create link ]';
+          copyPayload.textContent = '[ copy link ]';
+        }
+      }
+
+      btnGenerateTemp.addEventListener('click', async () => {
+        const content = buildRawContent();
+        if (!content) return;
+
+        btnGenerateTemp.disabled = true;
+        btnGenerateTemp.textContent = '[ encrypting... ]';
+
+        try {
+          const password = optPassword.value;
+          const encrypted = await encryptZeroKnowledge(
+            { type: state.payloadType, content },
+            password
+          );
+
+          const res = await fetch('/api/qr', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ciphertext: encrypted.ciphertext,
+              iv: encrypted.iv,
+              salt: encrypted.salt,
+              hasPassword: Boolean(password),
+              maxScans: parseInt(optBurn.value, 10),
+              ttl: parseInt(optTtl.value, 10)
+            })
+          });
+
+          if (!res.ok) throw new Error('server_error');
+
+          const { id } = await res.json();
+          const finalUrl = `${window.location.origin}/q/${id}#${encrypted.fragmentKey}`;
+
+          state.tempGenerated = true;
+          const scanTxt = optBurn.value === '1' ? '1 scan' : (optBurn.value === '0' ? 'unlimited' : `${optBurn.value} scans`);
+          drawMatrix(finalUrl, `[ temporary · ${scanTxt} · ready ]`, false);
+          copyPayload.textContent = '[ copy link ]';
+        } catch (err) {
+          qrStatus.textContent = '[ error: worker unreachable ]';
+        } finally {
+          btnGenerateTemp.disabled = false;
+          btnGenerateTemp.textContent = '[ generate temporary qr ]';
+        }
+      });
+
+      payloadBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          payloadBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.payloadType = btn.dataset.type;
+
+          inputUrlWrap.classList.toggle('slot-hidden', state.payloadType !== 'url');
+          inputTextWrap.classList.toggle('slot-hidden', state.payloadType !== 'text');
+          updateStaticOrMarkStale();
+        });
+      });
+
+      lifecycleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          lifecycleBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.mode = btn.dataset.mode;
+
+          const isTemp = state.mode === 'temporary';
+          tempBox.classList.toggle('visible', isTemp);
+          zkStatus.classList.toggle('invisible', !isTemp);
+          footerNote.textContent = isTemp ? 'zero-knowledge' : 'client-side';
+          updateStaticOrMarkStale();
+        });
+      });
+
+      [inputUrl, inputText, optBurn, optTtl, optPassword].forEach(el => {
+        el.addEventListener('input', updateStaticOrMarkStale);
+        el.addEventListener('change', updateStaticOrMarkStale);
+      });
+
+      dlPng.addEventListener('click', () => {
+        if (!state.qrInstance) return;
+        const qr = state.qrInstance;
+        const count = qr.getModuleCount();
+        const margin = 2;
+        const total = count + margin * 2;
+        const size = 1024;
+        const scale = size / total;
+
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = size;
+        offCanvas.height = size;
+        const ctx = offCanvas.getContext('2d');
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, size, size);
+        ctx.fillStyle = '#000000';
+
+        for (let r = 0; r < count; r++) {
+          for (let c = 0; c < count; c++) {
+            if (qr.isDark(r, c)) {
+              ctx.fillRect(
+                Math.round((c + margin) * scale),
+                Math.round((r + margin) * scale),
+                Math.ceil(scale),
+                Math.ceil(scale)
+              );
+            }
+          }
+        }
+
+        const link = document.createElement('a');
+        link.download = `larpujemy-qr-${Date.now()}.png`;
+        link.href = offCanvas.toDataURL('image/png');
+        link.click();
+      });
+
+      dlSvg.addEventListener('click', () => {
+        if (!state.qrInstance) return;
+        const qr = state.qrInstance;
+        const count = qr.getModuleCount();
+        const margin = 2;
+        const total = count + margin * 2;
+
+        let rects = `<rect width="${total}" height="${total}" fill="#ffffff"/>`;
+        for (let r = 0; r < count; r++) {
+          for (let c = 0; c < count; c++) {
+            if (qr.isDark(r, c)) {
+              rects += `<rect x="${c + margin}" y="${r + margin}" width="1" height="1" fill="#000000"/>`;
+            }
+          }
+        }
+
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${total} ${total}" shape-rendering="crispEdges">${rects}</svg>`;
+        const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.download = `larpujemy-qr-${Date.now()}.svg`;
+        link.href = url;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      });
+
+      copyPayload.addEventListener('click', async () => {
+        if (!state.lastEncoded) return;
+        try {
+          await navigator.clipboard.writeText(state.lastEncoded);
+          const prev = copyPayload.textContent;
+          copyPayload.textContent = '[ copied! ]';
+          setTimeout(() => { copyPayload.textContent = prev; }, 1400);
+        } catch (e) {}
+      });
+
+      // Initial static render
+      updateStaticOrMarkStale();
+    })();
+  </script>
+</body>
+</html>
